@@ -236,9 +236,11 @@ mindfulconnect/
 - Regular security audits
 - HIPAA compliance measures
 
-## Contributing
+## Contributors
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- **[Terrell D Lemons](LemonsTerrell@csu.fullerton.edu)** (CWID: 886659440)
+- **[Kyle Williams](Kyle.williams953@csu.fullerton.edu)** (CWID: 886805050)
+- **Luis Valle-Arellanes** (CWID: 889900429)
 
 ## License
 
