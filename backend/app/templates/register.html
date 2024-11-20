@@ -1,0 +1,188 @@
+<!-- backend/app/templates/register.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulConnect - Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
+        <!-- Header -->
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-bold text-gray-900">
+                Create your account
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Join MindfulConnect for mental health support
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <form class="mt-8 space-y-6" id="registerForm">
+            <!-- Error Message -->
+            <div id="errorMessage" class="text-red-500 text-center text-sm hidden"></div>
+
+            <!-- Username Field -->
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">
+                    Username
+                </label>
+                <input id="username" name="username" type="text" required
+                    class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Choose a username">
+            </div>
+
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Email address
+                </label>
+                <input id="email" name="email" type="email" required
+                    class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your email">
+            </div>
+
+            <!-- Full Name Field -->
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700">
+                    Full Name
+                </label>
+                <input id="fullName" name="fullName" type="text"
+                    class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your full name">
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">
+                    Password
+                </label>
+                <input id="password" name="password" type="password" required
+                    class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Create a password">
+                <p class="mt-1 text-xs text-gray-500">
+                    Must be at least 8 characters long and include a number and special character
+                </p>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div>
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+                    Confirm Password
+                </label>
+                <input id="confirmPassword" name="confirmPassword" type="password" required
+                    class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Confirm your password">
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="flex items-center">
+                <input id="terms" name="terms" type="checkbox" required
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="terms" class="ml-2 block text-sm text-gray-900">
+                    I agree to the 
+                    <a href="#" class="text-blue-600 hover:text-blue-500">Terms and Conditions</a>
+                    and
+                    <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                </label>
+            </div>
+
+            <!-- Register Button -->
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Create Account
+                </button>
+            </div>
+        </form>
+
+        <!-- Login Link -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">
+                Already have an account?
+                <a href="/login" class="font-medium text-blue-600 hover:text-blue-500">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorMessage = document.getElementById('errorMessage');
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Basic validation
+            if (password !== confirmPassword) {
+                errorMessage.textContent = "Passwords don't match";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            // Password strength validation
+            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+            if (!passwordRegex.test(password)) {
+                errorMessage.textContent = "Password must be at least 8 characters and include a number and special character";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        email: document.getElementById('email').value,
+                        full_name: document.getElementById('fullName').value,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Registration successful - redirect to login
+                    window.location.href = '/login?registered=true';
+                } else {
+                    // Show error message
+                    errorMessage.textContent = data.detail || 'Registration failed';
+                    errorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strength = {
+                length: password.length >= 8,
+                hasNumber: /\d/.test(password),
+                hasSpecial: /[@$!%*#?&]/.test(password),
+                hasLetter: /[A-Za-z]/.test(password)
+            };
+
+            // Update password field border color based on strength
+            const passwordField = e.target;
+            if (Object.values(strength).every(Boolean)) {
+                passwordField.classList.add('border-green-500');
+                passwordField.classList.remove('border-red-500');
+            } else {
+                passwordField.classList.add('border-red-500');
+                passwordField.classList.remove('border-green-500');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/lemonsmbp/Library/Mobile Documents/com~apple~CloudDocs/Documents/_COLLEGE/_COLLEGE_2024/2024 FALL/449 - Web Back-End/PROJECTS/mindfulconnect/venv/bin/python3.11" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from pytest import console_main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(console_main())

@@ -1,0 +1,165 @@
+<!-- backend/app/templates/health.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulConnect - System Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen p-6">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">System Health Dashboard</h1>
+                    <p class="text-gray-500">Last updated: <span id="timestamp"></span></p>
+                </div>
+            </div>
+
+            <!-- Overall Status -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">Overall Status</h2>
+                <div class="flex items-center space-x-4">
+                    <div id="overall-status" class="flex items-center space-x-2">
+                        <span id="status-indicator" class="h-3 w-3 rounded-full"></span>
+                        <span id="status-text"></span>
+                    </div>
+                    <span class="text-gray-600">Version: <span id="version"></span></span>
+                </div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- API Status -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-lg font-semibold mb-4">API Service</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Status:</span>
+                            <span id="api-status" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Version:</span>
+                            <span id="api-version" class="text-gray-900"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database Status -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-lg font-semibold mb-4">Database Service</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Status:</span>
+                            <span id="db-status" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                        </div>
+                        <div id="db-details" class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Version:</span>
+                                <span id="db-version" class="text-gray-900"></span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Connections:</span>
+                                <span id="db-connections" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Messages -->
+            <div id="error-container" class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4 hidden">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Error</h3>
+                        <div id="error-message" class="mt-2 text-sm text-red-700"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateStatusIndicator(elementId, status) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            element.className = 'px-3 py-1 rounded-full text-sm font-semibold';
+            
+            if (status.includes('healthy') || status.includes('operational')) {
+                element.classList.add('bg-green-100', 'text-green-800');
+            } else if (status.includes('degraded')) {
+                element.classList.add('bg-yellow-100', 'text-yellow-800');
+            } else {
+                element.classList.add('bg-red-100', 'text-red-800');
+            }
+            
+            element.textContent = status;
+        }
+
+        async function updateHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+
+                // Update timestamp
+                document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
+                
+                // Update version
+                document.getElementById('version').textContent = data.version;
+
+                // Update overall status
+                const statusIndicator = document.getElementById('status-indicator');
+                const statusText = document.getElementById('status-text');
+                statusIndicator.className = 'h-3 w-3 rounded-full';
+                statusIndicator.classList.add(data.status === 'healthy' ? 'bg-green-500' : 'bg-red-500');
+                statusText.textContent = data.status;
+
+                // Update API status
+                if (data.services.api) {
+                    updateStatusIndicator('api-status', data.services.api.status);
+                    document.getElementById('api-version').textContent = data.services.api.version;
+                }
+
+                // Update Database status
+                if (data.services.database) {
+                    const dbStatus = data.services.database.status;
+                    updateStatusIndicator('db-status', dbStatus);
+                    
+                    const dbDetails = document.getElementById('db-details');
+                    if (dbStatus === 'healthy') {
+                        dbDetails.classList.remove('hidden');
+                        document.getElementById('db-version').textContent = data.services.database.version;
+                        const connections = data.services.database.connections;
+                        document.getElementById('db-connections').textContent = 
+                            `${connections.current} / ${connections.available}`;
+                    } else {
+                        dbDetails.classList.add('hidden');
+                    }
+                }
+
+                // Hide error container
+                document.getElementById('error-container').classList.add('hidden');
+            } catch (error) {
+                console.error('Error updating health status:', error);
+                document.getElementById('error-container').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        // Initial update
+        updateHealth();
+
+        // Update every 5 seconds
+        setInterval(updateHealth, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!-- backend/app/templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulConnect - Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">MindfulConnect</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, {{ user.username }}</span>
+                    <button id="logoutBtn" class="text-red-600 hover:text-red-800">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Active Sessions -->
+            <div class="bg-white p-6 rounded-lg shadow animate__animated animate__fadeIn">
+                <h3 class="text-lg font-semibold mb-2">Active Sessions</h3>
+                <p id="activeSessionsCount" class="text-3xl font-bold text-blue-600">
+                    {{ analytics.total_interactions|default(0) }}
+                </p>
+            </div>
+
+            <!-- Support Groups -->
+            <div class="bg-white p-6 rounded-lg shadow animate__animated animate__fadeIn">
+                <h3 class="text-lg font-semibold mb-2">Support Groups</h3>
+                <p id="supportGroupsCount" class="text-3xl font-bold text-green-600">
+                    {{ analytics.support_groups_joined|default(0) }}
+                </p>
+            </div>
+
+            <!-- Average Mood -->
+            <div class="bg-white p-6 rounded-lg shadow animate__animated animate__fadeIn">
+                <h3 class="text-lg font-semibold mb-2">Average Mood</h3>
+                <p id="averageMood" class="text-3xl font-bold text-purple-600">
+                    {{ analytics.average_mood|default(0)|round(1) }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Activity Timeline -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4">Activity Timeline</h3>
+                <canvas id="activityChart"></canvas>
+            </div>
+
+            <!-- Mood Distribution -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4">Mood Distribution</h3>
+                <canvas id="moodChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Support Group Activity -->
+        <div class="bg-white p-6 rounded-lg shadow mb-8">
+            <h3 class="text-lg font-semibold mb-4">Support Group Activity</h3>
+            <div id="supportGroupStats" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+            <div id="activityFeed" class="space-y-4">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- WebSocket Connection Script -->
+    <script>
+        const token = "{{ token }}";
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/api/v1/ws/${token}`);
+            
+            ws.onopen = function() {
+                console.log('WebSocket Connected');
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                updateDashboard(data);
+            };
+
+            ws.onclose = function() {
+                console.log('WebSocket Disconnected');
+                // Attempt to reconnect after 5 seconds
+                setTimeout(connectWebSocket, 5000);
+            };
+
+            ws.onerror = function(error) {
+                console.error('WebSocket Error:', error);
+            };
+        }
+
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('activeSessionsCount').textContent = data.active_sessions;
+            document.getElementById('averageMood').textContent = data.current_mood;
+
+            // Update charts
+            updateActivityChart(data.activity_data);
+            updateMoodChart(data.mood_data);
+
+            // Update activity feed
+            updateActivityFeed(data.recent_activity);
+        }
+
+        function updateActivityChart(data) {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            if (window.activityChart) {
+                window.activityChart.destroy();
+            }
+            window.activityChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMoodChart(data) {
+            const ctx = document.getElementById('moodChart').getContext('2d');
+            if (window.moodChart) {
+                window.moodChart.destroy();
+            }
+            window.moodChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateActivityFeed(activities) {
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = activities.map(activity => `
+                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                    <p class="text-gray-700">${activity.content}</p>
+                    <span class="text-sm text-gray-500">
+                        ${new Date(activity.timestamp).toLocaleString()}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Initialize WebSocket connection
+        connectWebSocket();
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (ws) {
+                ws.close();
+            }
+            window.location.href = '/api/v1/auth/logout';
+        });
+    </script>
+</body>
+</html>
