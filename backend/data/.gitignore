@@ -1,0 +1,4 @@
+# backend/data/.gitignore
+*.log
+*.tmp
+WiredTigerLog.*
