@@ -23,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# REMOVED PACKAGE-LOCK FILE
+package-lock.json
