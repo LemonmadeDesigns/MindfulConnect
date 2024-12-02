@@ -1,0 +1,21 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'tailwindcss/tailwind.css';
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.lg\:ml-64 {  
+  margin-left: 0 !important;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 0 !important;
+}
+
