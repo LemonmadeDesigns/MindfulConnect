@@ -51,25 +51,33 @@ export const getUserGroups = async () => {
   }
 };
 
+const handleResponse = async (response) => {
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Something went wrong');
+  }
+  return data;
+};
+
 // Join a specific group
 export const joinSupportGroup = async (groupId) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('You must be logged in to join a group');
-  }
-
-  const response = await fetch(`${API_URL}/support-groups/${groupId}/join`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('You must be logged in to join a group');
     }
-  });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to join group');
+    const response = await fetch(`${API_URL}/support-groups/${groupId}/join`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return handleResponse(response);
+  } catch (error) {
+    console.error('Error joining group:', error);
+    throw error;
   }
-
-  return response.json();
 };

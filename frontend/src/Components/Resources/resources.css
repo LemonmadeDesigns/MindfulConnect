@@ -1,0 +1,10 @@
+@media (min-width: 768px) {
+    .md\:max-w-lg {
+      max-width: 27rem !important;
+      margin-right: 10px;
+    } 
+
+    .li-width {
+        width: 400px !important;
+    }
+  }

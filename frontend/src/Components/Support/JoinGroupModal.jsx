@@ -19,7 +19,7 @@ const JoinGroupModal = ({ group, onClose, onJoin }) => {
 
     try {
       await onJoin(group.id);
-      // Success will be handled by parent component
+      onClose(); // Close modal on success
     } catch (err) {
       setError(err.message || 'Failed to join group');
       setLoading(false);

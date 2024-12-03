@@ -1,6 +1,8 @@
 # Logs
 logs
 *.log
+*.tmp
+WiredTigerLog.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -25,7 +27,10 @@ dist-ssr
 *.sw?
 
 # REMOVED DATABASE FILES
-backend/data/
+data/
+data/journal/
+data/journal/*.log
+data/journal/*.preplog
 
 # REMOVED PACKAGE-LOCK FILE
 package-lock.json

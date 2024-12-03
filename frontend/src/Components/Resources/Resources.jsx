@@ -14,6 +14,8 @@ import {
   Search
 } from 'lucide-react';
 
+import "./resources.css"
+
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -162,7 +164,8 @@ const Resources = () => {
                   <p className="text-gray-600 mb-4">{resource.description}</p>
                   <ul className="space-y-2">
                     {resource.items.map((item, index) => (
-                      <li key={index} className="flex items-center">
+        
+                      <li key={index} className="flex items-center li-width">
                         {item.link ? (
                           <a
                             href={item.link}

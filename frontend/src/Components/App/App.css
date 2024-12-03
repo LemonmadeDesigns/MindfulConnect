@@ -14,8 +14,16 @@
   margin-left: 0 !important;
 }
 
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 0 !important;
+/* MOODANALYTICS.JSX */
+.focus-none:focus {
+  outline: none !important;
+}
+
+.outline-none:focus {
+  outline: none !important;
+}
+
+.recharts-sector:focus {
+  outline: none !important;
 }
 

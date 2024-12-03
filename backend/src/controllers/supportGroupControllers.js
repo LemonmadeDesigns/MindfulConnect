@@ -54,14 +54,39 @@ export const joinGroup = async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user.id;
 
-    // Check if user is already in the group
+    // Validate groupId
+    if (!groupId) {
+      return res.status(400).json({ 
+        message: 'Group ID is required' 
+      });
+    }
+
+    // Check if group exists
+    const group = await SupportGroup.findOne({ id: groupId });
+    if (!group) {
+      return res.status(404).json({ 
+        message: 'Support group not found' 
+      });
+    }
+
+    // Check if user is already a member
     const existingMembership = await UserGroup.findOne({
       user: userId,
       group: groupId
     });
 
     if (existingMembership) {
-      return res.status(400).json({ message: 'Already a member of this group' });
+      return res.status(400).json({ 
+        message: 'Already a member of this group' 
+      });
+    }
+
+    // Check if group is at capacity
+    const currentMembers = await UserGroup.countDocuments({ group: groupId });
+    if (currentMembers >= group.capacity) {
+      return res.status(400).json({ 
+        message: 'Group is at capacity' 
+      });
     }
 
     // Create new membership
@@ -72,10 +97,24 @@ export const joinGroup = async (req, res) => {
     });
 
     await newMembership.save();
-    res.status(201).json({ message: 'Successfully joined group' });
+
+    // Update group member count
+    await SupportGroup.findOneAndUpdate(
+      { id: groupId },
+      { $inc: { currentMembers: 1 } }
+    );
+
+    res.status(201).json({ 
+      message: 'Successfully joined group',
+      membership: newMembership
+    });
+
   } catch (error) {
     console.error('Error joining group:', error);
-    res.status(500).json({ message: 'Error joining group' });
+    res.status(500).json({ 
+      message: 'Error joining group',
+      error: error.message 
+    });
   }
 };
 

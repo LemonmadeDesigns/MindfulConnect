@@ -8,13 +8,17 @@ const userGroupSchema = new mongoose.Schema({
     required: true
   },
   group: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SupportGroup',
+    type: String, // Changed from ObjectId to String to match group.id
     required: true
   },
   joinedAt: {
     type: Date,
     default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'pending'],
+    default: 'active'
   }
 });
 
