@@ -123,22 +123,6 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Main Content Area */}
-      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="lg:col-span-1">
-          <MoodTracker onSave={handleMoodSaved} />
-        </div>
-        
-        <div className="lg:col-span-1">
-          <Card className="p-6 h-full shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Weekly Mood Trends</h3>
-            <div className="h-[300px] flex items-center justify-center text-gray-500">
-              <MoodVisualizations />
-            </div>
-          </Card>
-        </div>
-      </div> */}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-1">
           <MoodTracker onSave={handleMoodSaved} />

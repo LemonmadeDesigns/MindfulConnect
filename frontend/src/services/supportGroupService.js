@@ -62,25 +62,18 @@ const handleResponse = async (response) => {
 // Join a specific group
 export const joinSupportGroup = async (groupId) => {
   const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
+  if (!token) throw new Error('No authentication token found');
 
   try {
     const response = await fetch(`${API_URL}/support-groups/${groupId}/join`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to join group');
-    }
-
-    return response.json();
+    return handleResponse(response); // Ensure errors propagate correctly
   } catch (error) {
     console.error('Error joining group:', error);
     throw error;

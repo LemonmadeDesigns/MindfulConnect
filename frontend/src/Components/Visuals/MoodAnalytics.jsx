@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { getMoodEntries } from "../../services/moodService";
 
-import "./Visuals.css"
+import "./Visuals.css";
 
 const COLORS = {
   "Very Happy (8-10)": "#4CAF50",
@@ -22,29 +22,39 @@ const COLORS = {
 };
 
 const MoodAnalytics = () => {
-  const [moodData, setMoodData] = useState([]);
+  const [moodDistribution, setMoodDistribution] = useState([]);
+  const [moodStats, setMoodStats] = useState({
+    averageMood: 0,
+    commonEmotion: "",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const entries = await getMoodAnalytics();
-        setMoodData(entries);
-      } catch (err) {
-        setError('Failed to load analytics');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
+    fetchMoodData();
   }, []);
 
   const fetchMoodData = async () => {
     try {
       const entries = await getMoodEntries();
       if (entries && entries.length > 0) {
+        // Calculate average mood
+        const avgMood = (
+          entries.reduce((acc, entry) => acc + entry.moodLevel, 0) /
+          entries.length
+        ).toFixed(1);
+
+        // Find most common emotion
+        const emotionCounts = {};
+        entries.forEach((entry) => {
+          entry.emotions.forEach((emotion) => {
+            emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+          });
+        });
+        const commonEmotion = Object.entries(emotionCounts).sort(
+          (a, b) => b[1] - a[1]
+        )[0][0];
+
         // Process mood distribution
         const distribution = {
           "Very Happy (8-10)": 0,
@@ -63,16 +73,19 @@ const MoodAnalytics = () => {
           else distribution["Very Sad (1-2)"]++;
         });
 
-        // Convert to array format for PieChart
         const pieData = Object.entries(distribution)
           .map(([name, value]) => ({
             name,
             value,
             color: COLORS[name],
           }))
-          .filter((item) => item.value > 0); // Only include moods that exist
+          .filter((item) => item.value > 0);
 
         setMoodDistribution(pieData);
+        setMoodStats({
+          averageMood: avgMood,
+          commonEmotion: commonEmotion,
+        });
       }
     } catch (err) {
       console.error("Error fetching mood data:", err);
@@ -143,14 +156,16 @@ const MoodAnalytics = () => {
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-600">Average Mood</p>
-                      <p className="text-2xl font-bold text-indigo-600">7.2</p>
+                      <p className="text-2xl font-bold text-indigo-600">
+                        {moodStats.averageMood}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">
                         Most Common Emotion
                       </p>
                       <p className="text-2xl font-bold text-indigo-600">
-                        Happy
+                        {moodStats.commonEmotion}
                       </p>
                     </div>
                   </div>

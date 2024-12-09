@@ -53,18 +53,22 @@ const SupportGroupsOverview = () => {
   // Add the join handler
   const handleJoinGroup = async (groupId) => {
     try {
+      console.log('Joining group with ID:', groupId); // Debug log
       await joinSupportGroup(groupId);
-      setUserGroups((prev) => new Set([...prev, groupId]));
-      setJoiningGroup(null);
-      setJoinSuccess({
-        message: "Successfully joined the group!",
-        groupId,
-      });
+      console.log('Successfully joined group');
 
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setJoinSuccess(null);
-      }, 3000);
+      // await joinSupportGroup(groupId);
+      // setUserGroups((prev) => new Set([...prev, groupId]));
+      // setJoiningGroup(null);
+      // setJoinSuccess({
+      //   message: "Successfully joined the group!",
+      //   groupId,
+      // });
+
+      // // Clear success message after 3 seconds
+      // setTimeout(() => {
+      //   setJoinSuccess(null);
+      // }, 3000);
     } catch (error) {
       console.error("Failed to join group:", error);
       throw error;

@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import {
-  ResponsiveContainer,
   AreaChart,
   Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ComposedChart,
-  Line,
   BarChart,
   Bar,
+  CartesianGrid,
+  Cell,
+  ComposedChart,
+  Legend,
+  Line,
+  PieChart,
+  Pie,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 import { getMoodEntries } from "../../services/moodService.js";
@@ -56,6 +59,51 @@ function MoodVisualizations({ refreshTrigger }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add this function to process data for distribution charts
+  const getMoodDistribution = (data) => {
+    const distribution = {
+      'Very Happy (8-10)': 0,
+      'Happy (6-7)': 0,
+      'Neutral (5)': 0,
+      'Sad (3-4)': 0,
+      'Very Sad (1-2)': 0
+    };
+
+    data.forEach(entry => {
+      const level = entry.moodLevel;
+      if (level >= 8) distribution['Very Happy (8-10)']++;
+      else if (level >= 6) distribution['Happy (6-7)']++;
+      else if (level === 5) distribution['Neutral (5)']++;
+      else if (level >= 3) distribution['Sad (3-4)']++;
+      else distribution['Very Sad (1-2)']++;
+    });
+
+    return Object.entries(distribution).map(([name, value]) => ({
+      name,
+      value,
+      color: name.includes('Very Happy') ? '#4CAF50' :
+             name.includes('Happy') ? '#81C784' :
+             name.includes('Neutral') ? '#FFC107' :
+             name.includes('Sad') && !name.includes('Very') ? '#FF9800' :
+             '#F44336'
+    }));
+  };
+
+  const DistributionTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const total = processedData.length;
+      const percentage = ((payload[0].value / total) * 100).toFixed(1);
+      return (
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
+          <p className="text-sm font-semibold">{payload[0].name}</p>
+          <p className="text-sm">Count: {payload[0].value}</p>
+          <p className="text-sm">Percentage: {percentage}%</p>
+        </div>
+      );
+    }
+    return null;
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -157,6 +205,62 @@ function MoodVisualizations({ refreshTrigger }) {
               />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* New Mood Distribution Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Pie Chart */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Mood Distribution (Pie)</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={getMoodDistribution(processedData)}
+                  nameKey="name"
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                >
+                  {getMoodDistribution(processedData).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<DistributionTooltip />} />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Donut Chart */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Mood Distribution (Donut)</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={getMoodDistribution(processedData)}
+                  nameKey="name"
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                >
+                  {getMoodDistribution(processedData).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<DistributionTooltip />} />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>
