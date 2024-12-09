@@ -10,17 +10,18 @@ const Login = ({ onRegister }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Login.jsx
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
     try {
-      await login({ email, password });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+      // Add validation
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        return;
+      }
+      await login(email, password);
+    } catch (error) {
+      setError(error.message);
     }
   };
 

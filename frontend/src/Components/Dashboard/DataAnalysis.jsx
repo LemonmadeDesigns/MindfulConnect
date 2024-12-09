@@ -1,11 +1,12 @@
 // src/Components/Dashboard/DataAnalysis.jsx
 import React, { useState } from 'react';
+
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer,
   Area, AreaChart, ComposedChart, Bar, BarChart
 } from 'recharts';
-import { Card } from '../ui/Card';
+
 import { 
   Heart,
   Moon,
@@ -13,6 +14,8 @@ import {
   Clock,
   Zap
 } from 'lucide-react';
+
+import { Card } from '../ui/Card';
 
 const DataAnalysis = () => {
   const [timeRange, setTimeRange] = useState('week');

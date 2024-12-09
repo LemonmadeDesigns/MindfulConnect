@@ -42,56 +42,16 @@ export const createMoodEntry = async (req, res) => {
 
 export const getMoodEntries = async (req, res) => {
   try {
-    console.log("Getting mood entries for user: ", req.user.id);
-
-    const entries = await MoodEntry.find({ user: req.user.id }).sort({
-      timestamp: -1,
-    });
+    const entries = await MoodEntry.find({ userId: req.user.id })
+      .sort({ timestamp: -1 })
+      .select('moodLevel emotions timestamp');
 
     res.json(entries);
   } catch (error) {
-    console.error("Error in getMoodEntries:", error);
-    res.status(500).json({
-      message: "Error fetching mood entries",
-      error: error.message,
-    });
+    console.error('Error fetching mood entries:', error);
+    res.status(500).json({ message: 'Error fetching mood entries' });
   }
 };
-
-// export const getAnalytics = async (req, res) => {
-//   try {
-//     console.log("Getting analytics for user:", req.user.id);
-
-//     const entries = await MoodEntry.find({ user: req.user.id })
-//       .sort({ timestamp: -1 })
-//       .select("moodLevel emotion timestamp");
-
-//     if (!entries) {
-//       return res.status(404).json({ message: "No mood entries found" });
-//     }
-
-//     // Process analytics data
-//     const analyticData = {
-//       entries,
-//       summary: {
-//         totalEntries: entries.length,
-//         averageMood:
-//           entries.reduce((acc, entry) => acc + entry.moodLevel, 0) /
-//             entries.length || 0,
-//         recentMood: entries[0]?.moodLevel || 0,
-//         recentEmotion: entries[0]?.emotion || "No entries",
-//       },
-//     };
-
-//     res.json(analyticData);
-//   } catch (error) {
-//     console.error("Error in getAnalytics:", error);
-//     res.status(500).json({
-//       message: "Error fetching mood analytics",
-//       error: error.message,
-//     });
-//   }
-// };
 
 // backend/src/controllers/moodController.js
 export const getAnalytics = async (req, res) => {

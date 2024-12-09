@@ -1,0 +1,31 @@
+.relative.flex-1,
+#root
+  > div
+  > div
+  > main
+  > div
+  > div
+  > div.grid.grid-cols-1.gap-6
+  > div
+  > div
+  > div
+  > div {
+  position: relative !important;
+  right: 0 !important;
+  width: 100% !important;
+  top: 0 !important;
+}
+
+@media (max-width: 768px) {
+  #root
+    > div
+    > div
+    > main
+    > div
+    > div
+    > div.mb-8.space-y-4
+    > div
+    > div.flex.gap-2 {
+    flex-direction: column;
+  }
+}

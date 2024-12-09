@@ -80,10 +80,22 @@ Before setting up the project, ensure you have the following installed:
 
 ### Running the Application
 
-1. Start MongoDB:
+1. Start MongoDB with a local data directory:
 
    ```bash
-   mongod
+   # Create a data directory if it doesn't exist
+   mkdir -p data/db
+
+   # Start MongoDB using the project's data directory
+   mongod --dbpath data/db
+   ```
+
+   Note: Keep this terminal window running. Open a new terminal for the next steps.
+
+   If you encounter any permission issues with the data directory, run:
+
+   ```bash
+   sudo chown -R `id -un` data/db
    ```
 
 2. Start the backend server:
@@ -189,4 +201,4 @@ Special thanks to:
 
 ---
 
-Project Link: [https://github.com/yourusername/mindfulconnect](https://github.com/yourusername/mindfulconnect)
+Project Link: [https://github.com/LemonmadeDesigns/MindfulConnect](https://github.com/LemonmadeDesigns/MindfulConnect)

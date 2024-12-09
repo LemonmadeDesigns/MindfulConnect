@@ -40,18 +40,31 @@ export const createMoodEntry = async (moodData) => {
 };
 
 export const getMoodEntries = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("No authentication token found");
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    console.log("Fetching mood entries..."); // Debug log
+
+    const response = await fetch(`${API_URL}/mood`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Mood entries received:", data); // Debug log
+    return data;
+  } catch (error) {
+    console.error("Error fetching mood entries:", error);
+    return []; // Return empty array instead of throwing
   }
-
-  const response = await fetch(`${API_URL}/mood`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return handleResponse(response);
 };
 
 // Added getMoodHistory as an alias for getMoodEntries

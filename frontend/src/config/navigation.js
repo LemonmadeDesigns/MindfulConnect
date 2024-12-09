@@ -13,13 +13,13 @@ export const navigationItems = [
     label: 'Dashboard',
     icon: LayoutDashboard
   },
+  // {
+  //   path: '/analytics',
+  //   label: 'Analytics',
+  //   icon: LineChart
+  // },
   {
     path: '/analytics',
-    label: 'Analytics',
-    icon: LineChart
-  },
-  {
-    path: '/mood-tracker',
     label: 'Mood Tracker',
     icon: SmilePlus
   },

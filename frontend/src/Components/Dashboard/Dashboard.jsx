@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { getMoodEntries } from '../../services/moodService';
 import { getAllGroups } from '../../services/supportGroupService';
-import MoodTracker from './MoodTracker';
-import SupportGroupActivity from './SupportGroupActivity';
+import MoodTracker from './../Visuals/MoodTracker';
+import MoodVisualizations from '../Visuals/MoodVisualizations';
+import SupportGroupActivity from './../Visuals/SupportGroupActivity';
 // import DataAnalysis from './DataAnalysis';
 
 const Dashboard = () => {
@@ -16,6 +17,7 @@ const Dashboard = () => {
     averageMood: 0
   });
 
+  const [refreshKey, setRefreshKey] = useState(0); // Add this
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -58,9 +60,10 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleMoodSaved = () => {
+  const handleMoodSaved = async () => {
     // Refresh dashboard data when a new mood entry is saved
-    fetchDashboardData();
+    await fetchDashboardData();
+    setRefreshKey(prev => prev + 1); // Add this to trigger refresh
   };
 
   if (loading) {
@@ -121,6 +124,21 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Area */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-1">
+          <MoodTracker onSave={handleMoodSaved} />
+        </div>
+        
+        <div className="lg:col-span-1">
+          <Card className="p-6 h-full shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Weekly Mood Trends</h3>
+            <div className="h-[300px] flex items-center justify-center text-gray-500">
+              <MoodVisualizations />
+            </div>
+          </Card>
+        </div>
+      </div> */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-1">
           <MoodTracker onSave={handleMoodSaved} />
@@ -130,17 +148,15 @@ const Dashboard = () => {
           <Card className="p-6 h-full shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Weekly Mood Trends</h3>
             <div className="h-[300px] flex items-center justify-center text-gray-500">
-              No mood data available
+              <MoodVisualizations refreshTrigger={refreshKey} />
             </div>
           </Card>
         </div>
       </div>
 
       {/* Support Group Activity */}
-      <Card className="p-6 shadow-sm hover:shadow-md transition-shadow">
-        
+      <Card className="p-6 shadow-sm hover:shadow-md transition-shadow"> 
         <SupportGroupActivity />
-        {/* <DataAnalysis /> */}
       </Card>
     </div>
   );

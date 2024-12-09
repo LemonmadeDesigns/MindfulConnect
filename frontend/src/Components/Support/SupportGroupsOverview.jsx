@@ -1,6 +1,6 @@
 // src/Components/Support/SupportGroupsOverview.jsx
 import { useEffect, useState } from "react";
-import { Card } from "../ui/Card";
+
 import {
   AlertCircle,
   ArrowRight,
@@ -15,11 +15,14 @@ import {
   Users,
 } from "lucide-react";
 
+import { Card } from "../ui/Card";
 import {
   getUserGroups,
   joinSupportGroup,
 } from "../../services/supportGroupService";
 import JoinGroupModal from "./JoinGroupModal";
+
+import './supportGroup.css'
 
 const SupportGroupsOverview = () => {
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
 import { Card, CardContent } from '../ui/Card';
 import { useAuth } from './AuthContext';
 
@@ -25,17 +27,19 @@ const Register = ({ onBackToLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
     setIsLoading(true);
+
     try {
+      if (formData.password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+  
+      console.log("Submitting registration:", formData); // Add this log
       await register(formData);
+      // If successful, navigate or show success message
     } catch (err) {
-      setError(err.message);
+      console.error("Registration error:", err); // Add this log
+      setError(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
