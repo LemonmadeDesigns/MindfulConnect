@@ -9,6 +9,8 @@ import MoodVisualizations from '../Visuals/MoodVisualizations';
 import SupportGroupActivity from './../Visuals/SupportGroupActivity';
 // import DataAnalysis from './DataAnalysis';
 
+import "./Dashboard.css"
+
 const Dashboard = () => {
 
   const [stats, setStats] = useState({
@@ -131,7 +133,7 @@ const Dashboard = () => {
         <div className="lg:col-span-1">
           <Card className="p-6 h-full shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Weekly Mood Trends</h3>
-            <div className="h-[300px] flex items-center justify-center text-gray-500">
+            <div className="h-[300px] longer flex items-center justify-center text-gray-500">
               <MoodVisualizations refreshTrigger={refreshKey} />
             </div>
           </Card>

@@ -1,0 +1,22 @@
+.longer {
+  height: auto !important;
+}
+
+#root
+  > div
+  > div
+  > main
+  > div
+  > div.grid.grid-cols-1.lg\:grid-cols-2.gap-6
+  > div:nth-child(2)
+  > div
+  > div
+  > div {
+  position: relative;
+  top: -3em !important;
+  width: 100%;
+}
+
+.text-gray-800 {
+  height: 74px !important;
+}
